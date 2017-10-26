@@ -1,0 +1,52 @@
+{
+  "name": "sequelize_graphql_starter",
+  "version": "1.0.0",
+  "description": "Sequelize GraphQL Starter generates a GraphQL server with queries and CUD mutations for each of your entities",
+  "main": "index.js",
+  "dependencies": {
+    "babel-register": "^6.24.0",
+    "babel-resolver": "^1.1.0",
+    "cookie-parser": "~1.4.3",
+    "cors": "^2.8.3",
+    "debug": "~2.6.0",
+    "dotenv": "^4.0.0",
+    "express": "~4.15.2",
+    "express-generator": "^4.14.1",
+    "express-graphql": "^0.6.11",
+    "graphql": "~0.11.7",
+    "graphql-relay": "~0.5.3",
+    "graphql-sequelize": "^5.3.1",
+    "morgan": "~1.8.1",
+    "pg": "^6.1.5",
+    "pg-hstore": "^2.3.2",
+    "pug": "~2.0.0-rc.4",
+    "sequelize": "^3.30.2",
+    "sequelize-cli": "^2.6.0",
+    "serve-favicon": "~2.4.2",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.4.0",
+    "babel-preset-env": "^1.2.2",
+    "bluebird": "^3.5.0",
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^3.3.0",
+    "nodemon": "^1.11.0",
+    "supertest": "^3.0.0"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec --timeout 10000 --compilers js:babel-core/register",
+    "watch": "mocha --reporter spec --timeout 10000 --watch test/**/*.js* --compilers js:babel-core/register",
+    "start": "nodemon src/app.js --exec babel-node --presets env",
+    "build": "babel src --presets babel-preset-env --out-dir distribution"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:wilburhimself/graphql_sequelize_starter.git"
+  },
+  "author": "Wilbur Suero",
+  "license": "MIT",
+  "homepage": "https://github.com/wilburhimself/graphql_sequelize_starter"
+}
