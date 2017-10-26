@@ -1,5 +1,5 @@
 import GraphqlHTTP from 'express-graphql';
-import schema from '../api';
+import schema from '../entities';
 
 const routes = require('express').Router();
 

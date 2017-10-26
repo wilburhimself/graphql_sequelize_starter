@@ -11,7 +11,7 @@ const autoload = () => {
   output.queries = {};
   output.mutations = {};
 
-  let normalizedPath = path.resolve('src/api/');
+  let normalizedPath = path.resolve('src/entities/');
   fs.readdirSync(normalizedPath).forEach((file) => {
     let modulePath = normalizedPath + '/' + file;
     if (fs.lstatSync(modulePath).isDirectory()) {
