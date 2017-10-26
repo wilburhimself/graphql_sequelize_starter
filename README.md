@@ -28,33 +28,34 @@ For each entity in your application you must create a directory in `src/entities
 import Sequelize from "sequelize";
 import db from "../../lib/database";
 
-const Post = db.define("Post", {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        field: 'id'
-      },
-      title: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        field: 'name'
-      },
-
-      introduction: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        field: 'introduction'
-      },
-
-      body: {
-        type: Sequelize.TEXT,
-        field: 'body'
-      },
-    }, {
-      tableName: 'posts',
-      timestamps: false
-    }
+const Post = db.define("Post", 
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      field: 'id'
+    },
+    title: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      field: 'name'
+    },
+  
+    introduction: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      field: 'introduction'
+    },
+  
+    body: {
+      type: Sequelize.TEXT,
+      field: 'body'
+    },
+  }, {
+    tableName: 'posts',
+    timestamps: false
+  }
 );
 
 export default Post;
