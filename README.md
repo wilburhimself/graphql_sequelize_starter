@@ -208,8 +208,8 @@ npx prettier --write .
 ## Contributing
 
 - Keep changes small and focused.
-- Prefer intention-revealing code over comments; follow Rails/DHH-style pragmatism.
-- Favor POROs/service objects for domain logic; avoid overusing concerns/monkey-patching.
+- Prefer intention-revealing code over comments
+
 - Add or update unit tests alongside code changes.
 
 ## Continuous Integration
