@@ -10,10 +10,11 @@ describe('buildQuery', () => {
       fields: { id: { type: GraphQLInt } },
     });
     const fields = buildQuery('users', gqlType as unknown, model);
-    const field = (fields as any).users;
-    const result = field.resolve(null, { id: 1 });
+    const view = fields as Record<string, { resolve: (parent: unknown, args: unknown) => unknown }>;
+    const field = view.users;
+    const result = field.resolve(null, { id: 1 }) as Promise<unknown>[];
     // result is an array of Promises when id is provided
-    const rows = await Promise.all(result as Promise<any>[]);
+    const rows = (await Promise.all(result)) as Array<Record<string, unknown>>;
     expect(rows.length).toBe(1);
     expect(rows[0]).toEqual({ id: 1, name: 'A' });
   });
@@ -28,8 +29,9 @@ describe('buildQuery', () => {
       fields: { id: { type: GraphQLInt } },
     });
     const fields = buildQuery('users', gqlType as unknown, model);
-    const field = (fields as any).users;
-    const rows = await field.resolve(null, {});
+    const view = fields as Record<string, { resolve: (parent: unknown, args: unknown) => unknown }>;
+    const field = view.users;
+    const rows = (await field.resolve(null, {})) as unknown[];
     expect(Array.isArray(rows)).toBe(true);
     expect(rows.length).toBe(2);
   });
@@ -45,8 +47,9 @@ describe('buildQuery', () => {
       fields: { id: { type: GraphQLInt } },
     });
     const fields = buildQuery('users', gqlType as unknown, model);
-    const field = (fields as any).users;
-    const rows = await field.resolve(null, { page: 2, limit: 1 });
+    const view = fields as Record<string, { resolve: (parent: unknown, args: unknown) => unknown }>;
+    const field = view.users;
+    const rows = (await field.resolve(null, { page: 2, limit: 1 })) as unknown[];
     expect(Array.isArray(rows)).toBe(true);
   });
 });
