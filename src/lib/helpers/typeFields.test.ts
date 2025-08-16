@@ -3,7 +3,7 @@ import { GraphQLString, GraphQLBoolean, GraphQLInt, GraphQLFloat } from 'graphql
 
 describe('helpers/typeFields', () => {
   test('getFieldType maps known Sequelize types', () => {
-    const mk = (key: string) => ({ fieldName: 'x', type: { constructor: { key } } } as any);
+    const mk = (key: string) => ({ fieldName: 'x', type: { constructor: { key } } });
     expect(getFieldType(mk('STRING'))).toBe(GraphQLString);
     expect(getFieldType(mk('BOOLEAN'))).toBe(GraphQLBoolean);
     expect(getFieldType(mk('INTEGER'))).toBe(GraphQLInt);
@@ -11,7 +11,7 @@ describe('helpers/typeFields', () => {
   });
 
   test('getFieldType falls back to string', () => {
-    const fld = { fieldName: 'x', type: { constructor: { key: 'UNKNOWN' } } } as any;
+    const fld = { fieldName: 'x', type: { constructor: { key: 'UNKNOWN' } } };
     expect(getFieldType(fld)).toBe(GraphQLString);
   });
 
@@ -19,13 +19,14 @@ describe('helpers/typeFields', () => {
     const model: ModelLike = {
       name: 'User',
       attributes: {
-        id: { fieldName: 'id', type: { constructor: { key: 'INTEGER' } } } as any,
-        name: { fieldName: 'name', type: { constructor: { key: 'STRING' } } } as any,
+        id: { fieldName: 'id', type: { constructor: { key: 'INTEGER' } } },
+        name: { fieldName: 'name', type: { constructor: { key: 'STRING' } } },
       },
-    } as any;
+    };
     const fields = getModelFields(model);
+    const view = fields as Record<string, { type: unknown }>;
     expect(Object.keys(fields)).toEqual(['id', 'name']);
-    expect((fields as any).id.type).toBe(GraphQLInt);
-    expect((fields as any).name.type).toBe(GraphQLString);
+    expect(view['id'].type).toBe(GraphQLInt);
+    expect(view['name'].type).toBe(GraphQLString);
   });
 });

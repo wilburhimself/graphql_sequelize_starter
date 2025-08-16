@@ -62,7 +62,10 @@ class Resolver<T extends Record<string, unknown> = Record<string, unknown>> {
     return this.entity.create(item).then((result) => result);
   }
 
-  update<TId extends number | string, TInput extends Partial<T>>(id: TId, item: TInput): Promise<T | null> {
+  update<TId extends number | string, TInput extends Partial<T>>(
+    id: TId,
+    item: TInput,
+  ): Promise<T | null> {
     return this.entity.update(item, { where: { id: id } }).then(() => this.find(id));
   }
 

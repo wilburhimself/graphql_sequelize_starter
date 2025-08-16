@@ -5,13 +5,7 @@ const prettierPlugin = require('eslint-plugin-prettier');
 
 module.exports = [
   {
-    ignores: [
-      'dist/**',
-      'coverage/**',
-      'node_modules/**',
-      '.eslintrc.cjs',
-      'src/**/*.js',
-    ],
+    ignores: ['dist/**', 'coverage/**', 'node_modules/**', '.eslintrc.cjs', 'src/**/*.js'],
   },
   // Only apply TS rules to TS files
   ...tseslint.configs.recommended,

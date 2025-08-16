@@ -19,7 +19,10 @@ describe('buildQuery', () => {
   });
 
   test('resolves list when no args', async () => {
-    const model = makeEntity([{ id: 1, name: 'A' }, { id: 2, name: 'B' }]);
+    const model = makeEntity([
+      { id: 1, name: 'A' },
+      { id: 2, name: 'B' },
+    ]);
     const gqlType = new GraphQLObjectType({
       name: 'UserType',
       fields: { id: { type: GraphQLInt } },
@@ -32,7 +35,11 @@ describe('buildQuery', () => {
   });
 
   test('resolves list with pagination args', async () => {
-    const model = makeEntity([{ id: 1, name: 'A' }, { id: 2, name: 'B' }, { id: 3, name: 'C' }]);
+    const model = makeEntity([
+      { id: 1, name: 'A' },
+      { id: 2, name: 'B' },
+      { id: 3, name: 'C' },
+    ]);
     const gqlType = new GraphQLObjectType({
       name: 'UserType',
       fields: { id: { type: GraphQLInt } },

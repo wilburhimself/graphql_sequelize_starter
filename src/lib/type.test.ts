@@ -16,7 +16,7 @@ describe('buildType', () => {
     expect(type).toBeInstanceOf(GraphQLObjectType);
     expect((type as any).name).toBe('UserType');
 
-    const fields = ((type as any).getFields() as any);
+    const fields = (type as any).getFields() as any;
     expect(Object.keys(fields)).toEqual(['id', 'name']);
     expect(fields.id.type).toBe(GraphQLInt);
     expect(fields.name.type).toBe(GraphQLString);

@@ -14,5 +14,7 @@ declare module 'express-graphql' {
     customFormatErrorFn?: (error: unknown) => unknown;
   }
 
-  export default function graphqlHTTP(options: Options | ((req: unknown) => Options)): RequestHandler;
+  export default function graphqlHTTP(
+    options: Options | ((req: unknown) => Options),
+  ): RequestHandler;
 }
