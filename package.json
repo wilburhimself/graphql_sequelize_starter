@@ -1,7 +1,7 @@
 {
-  "name": "sequelize_graphql_starter",
+  "name": "graphql-api-starter",
   "version": "1.0.0",
-  "description": "Sequelize GraphQL Starter generates a GraphQL server with queries and CUD mutations for each of your entities",
+  "description": "Starter kit for building a TypeScript GraphQL server with generated queries and CUD mutations per entity. ORM-agnostic with legacy Sequelize support during migration.",
   "main": "index.js",
   "dependencies": {
     "babel-register": "^6.24.0",

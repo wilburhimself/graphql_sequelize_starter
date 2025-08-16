@@ -1,4 +1,4 @@
-# Sequelize GraphQL Starter
+# graphql-api-starter
 
 Starter kit for building a GraphQL server on Sequelize, with generated queries and CUD mutations per entity. Core libraries are written in TypeScript and covered by tests; entities can remain in legacy JS during migration.
 
@@ -170,6 +170,108 @@ npm run lint
 npm run lint -- --fix
 npx prettier --write .
 ```
+
+## Roadmap
+
+### Phase 2. ORM Upgrade: Prisma
+
+1. **Introduce Prisma**
+    - Replace Sequelize with Prisma.
+    - Define schema in `prisma/schema.prisma`.
+    - Run migrations (`prisma migrate`).
+2. **Generate types**
+    - Run `prisma generate` to autogen TS client + types.
+3. **Testing**
+    - Use a test DB (SQLite in-memory).
+    - Integration tests around Prisma models.
+
+✅ Deliverable: Database layer fully migrated, typed, and tested.
+
+---
+
+### Phase 3. GraphQL Layer: Schema + Server
+
+1. **Replace hand-rolled schema with Pothos**
+    - Use **Pothos** to define schema with full type safety.
+    - Hook into Prisma plugin for auto-typed resolvers.
+2. **Apollo Server setup**
+    - Replace current server with Apollo Server.
+    - Add GraphQL Playground for dev.
+    - Add `@deprecated` directives for evolvability.
+3. **Testing**
+    - Snapshot tests for schema (GraphQL introspection → snapshot).
+    - Query & mutation tests using Apollo’s `createTestClient`.
+
+✅ Deliverable: Strongly typed GraphQL server powered by Apollo + Pothos.
+
+---
+
+### Phase 4. Performance Safeguards
+
+1. **DataLoader**
+    - Add batching & caching for common relations.
+2. **Pagination**
+    - Implement cursor-based pagination (`first`, `after`).
+3. **Query limits**
+    - Use Apollo’s validation rules for max depth & complexity.
+4. **Testing**
+    - Unit tests for loaders (batching works, N+1 avoided).
+    - Integration tests for pagination correctness.
+    - Security tests: overly deep query should fail.
+
+✅ Deliverable: Efficient, N+1-safe, query-limited API.
+
+---
+
+### Phase 5. Security & Auth
+
+1. **JWT/OAuth middleware**
+    - Add auth context in Apollo.
+    - Example: role-based access in resolvers.
+2. **Validation**
+    - Input validation with Zod/Yup at mutation layer.
+3. **Testing**
+    - Auth tests (unauthorized requests rejected).
+    - Mutation validation tests (bad inputs rejected).
+
+✅ Deliverable: Secure, validated GraphQL API with tested auth.
+
+---
+
+### Phase 6. Subscriptions & Real-Time
+
+1. **Enable WebSocket subscriptions** in Apollo.
+    - Example: `onPostAdded` subscription.
+2. **Testing**
+    - Subscription integration tests (publish/subscribe events).
+
+✅ Deliverable: Real-time GraphQL capability demonstrated.
+
+---
+
+### Phase 7. Tooling & DX
+
+1. **GraphQL Code Generator**
+    - Generate TypeScript types for queries/resolvers.
+2. **Schema checks in CI**
+    - Add **GraphQL Inspector** to validate schema diffs.
+    - Prevent breaking changes in pull requests.
+3. **Schema visualization**
+    - Bundle Voyager / GraphiQL Explorer in dev mode.
+
+✅ Deliverable: Fully tooled DX stack with CI schema safety.
+
+---
+
+### Phase 8. CI/CD Polish
+
+1. **CI with GitHub Actions**
+    - Run lint, type check, tests, coverage.
+    - Run `graphql-inspector diff` against main branch schema.
+2. **Optional: Deploy demo**
+    - Deploy to Railway/Render/Heroku as a live demo.
+
+✅ Deliverable: Portfolio-ready repo with CI/CD and live demo link.
 
 ## Contributing
 
