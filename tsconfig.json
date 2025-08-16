@@ -20,6 +20,8 @@
     "node_modules",
     "dist",
     "src/routes/**/*.js",
-    "src/entities/**/*.js"
+    "src/entities/**/*.js",
+    "src/lib/**/*.js",
+    "src/lib/helpers/**/*.js"
   ]
 }

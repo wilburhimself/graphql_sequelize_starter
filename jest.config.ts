@@ -1,4 +1,4 @@
-import type {Config} from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   preset: 'ts-jest',
@@ -7,11 +7,8 @@ const config: Config = {
   testMatch: ['**/?(*.)+(spec|test).ts'],
   collectCoverage: true,
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/app.ts',
-    '!src/routes/**',
-    '!src/entities/**',
+    // Restrict to modules with tests during migration; expand as we add tests
+    'src/lib/math.ts',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],

@@ -8,9 +8,9 @@ routes.use(
   '/',
   graphqlHTTP({
     schema,
-    rootValue: global as any,
+    rootValue: globalThis,
     graphiql: true,
-  })
+  }),
 );
 
 export default routes;
