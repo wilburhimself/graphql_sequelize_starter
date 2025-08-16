@@ -1,13 +1,22 @@
 import { GraphQLList, GraphQLInt, GraphQLBoolean, GraphQLString } from 'graphql';
-import Resolver, { Entity } from './resolver';
+import Resolver, { Entity, AllOptions } from './resolver';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 type GraphQLCompositeType = unknown; // from local graphql shim, keep minimal
 
-type ResolveArgs = {
-  id?: number;
+type ResolveByIdArgs = {
+  id: number;
+  page?: never;
+  limit?: never;
+  offset?: never;
+  all?: never;
+  order?: never;
+};
+
+type ResolveListArgs = {
+  id?: undefined;
   page?: number;
   limit?: number;
   offset?: number;
@@ -15,8 +24,14 @@ type ResolveArgs = {
   order?: string;
 };
 
-const buildQuery = (name: string, type: GraphQLCompositeType, model: Entity) => {
-  const resolver = new Resolver(model);
+type ResolveArgs = ResolveByIdArgs | ResolveListArgs;
+
+const buildQuery = <T extends Record<string, unknown>>(
+  name: string,
+  type: GraphQLCompositeType,
+  model: Entity<T>,
+) => {
+  const resolver = new Resolver<T>(model);
   return {
     [name]: {
       type: new GraphQLList(type as unknown),
@@ -28,23 +43,23 @@ const buildQuery = (name: string, type: GraphQLCompositeType, model: Entity) => 
         all: { type: GraphQLBoolean },
         order: { type: GraphQLString },
       },
-      resolve: (_value: unknown, { id, page, limit, offset, all, order }: ResolveArgs) => {
-        return (() => {
-          if (id) {
-            return [resolver.find(id)];
-          } else {
-            const settings =
-              limit || page || offset || order
-                ? {
-                    currentPage: page ? page : 0,
-                    limit: limit ? limit : Number(process.env.APP_PERPAGE),
-                    offset: offset ? offset : 0,
-                    order: order ? order : '',
-                  }
-                : { all };
-            return resolver.all(settings);
-          }
-        })();
+      resolve: (
+        _value: unknown,
+        { id, page, limit, offset, all, order }: ResolveArgs,
+      ): Promise<T[]> | Array<Promise<T | null>> => {
+        if (id !== undefined) {
+          return [resolver.find(id)];
+        }
+        const settings: AllOptions =
+          limit || page || offset || order
+            ? {
+                currentPage: page ? page : 0,
+                limit: limit ? limit : Number(process.env.APP_PERPAGE),
+                offset: offset ? offset : 0,
+                order: order ? order : '',
+              }
+            : { all };
+        return resolver.all(settings);
       },
     },
   } as Record<string, unknown>;

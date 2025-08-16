@@ -3,20 +3,20 @@ import { GraphQLID } from 'graphql';
 
 type GraphQLTypeLike = unknown; // minimal due to local graphql shim
 
-const buildMutation = (
+const buildMutation = <T extends Record<string, unknown>>(
   name: string,
   type: GraphQLTypeLike,
   input: GraphQLTypeLike,
-  model: Entity,
+  model: Entity<T>,
 ) => {
-  const resolver = new Resolver(model);
+  const resolver = new Resolver<T>(model);
   return {
     [`create${name}`]: {
       type: type as unknown,
       args: {
         input: { type: input as unknown },
       },
-      resolve: (_value: unknown, { input }: { input: Record<string, unknown> }) => {
+      resolve: (_value: unknown, { input }: { input: Partial<T> }) => {
         return resolver.create(input);
       },
     },
@@ -26,10 +26,7 @@ const buildMutation = (
         id: { type: GraphQLID },
         input: { type: input as unknown },
       },
-      resolve: (
-        _value: unknown,
-        { id, input }: { id: string | number; input: Record<string, unknown> },
-      ) => {
+      resolve: (_value: unknown, { id, input }: { id: string | number; input: Partial<T> }) => {
         return resolver.update(id, input);
       },
     },

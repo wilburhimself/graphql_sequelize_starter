@@ -15,13 +15,15 @@ export interface Entity<T = Record<string, unknown>> {
   update(item: Partial<T>, opts: UpdateOptions): Promise<unknown>;
 }
 
-type AllOptions = {
+export type AllOptions = {
   currentPage?: number;
   limit?: number;
   offset?: number;
   order?: string;
   all?: boolean;
 };
+
+export type QueryOptions = Pick<AllOptions, 'currentPage' | 'limit' | 'offset' | 'order'>;
 
 class Resolver<T extends Record<string, unknown> = Record<string, unknown>> {
   private entity: Entity<T>;
@@ -45,7 +47,7 @@ class Resolver<T extends Record<string, unknown> = Record<string, unknown>> {
     Object.assign(defaults, { order: hasNameField ? 'name ASC' : options?.order });
 
     const settings = Object.assign({}, defaults, options || {});
-    const queryOptions: Record<string, unknown> = {};
+    const queryOptions: QueryOptions = {};
 
     if (!settings.all) {
       Object.assign(queryOptions, {
