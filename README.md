@@ -1,6 +1,19 @@
 # graphql-api-starter
 
+[![Use this template](https://img.shields.io/badge/Use_this_template-2ea44f?logo=github&logoColor=white)](https://github.com/wilburhimself/graphql_api_starter/generate)
+
 Starter kit for building a GraphQL server on Sequelize, with generated queries and CUD mutations per entity. Core libraries are written in TypeScript and covered by tests; entities can remain in legacy JS during migration.
+
+## Quickstart
+
+- Use the GitHub template button above, or clone the template locally:
+
+```
+npx degit wilburhimself/graphql_api_starter my-app
+cd my-app
+npm install
+npm run dev
+```
 
 ### Config
 

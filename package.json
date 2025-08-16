@@ -61,9 +61,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:wilburhimself/graphql_sequelize_starter.git"
+    "url": "git@github.com:wilburhimself/graphql_api_starter.git"
   },
   "author": "Wilbur Suero",
   "license": "MIT",
-  "homepage": "https://github.com/wilburhimself/graphql_sequelize_starter"
+  "homepage": "https://github.com/wilburhimself/graphql_api_starter"
 }
