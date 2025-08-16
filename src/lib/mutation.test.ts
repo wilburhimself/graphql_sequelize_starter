@@ -1,26 +1,5 @@
 import buildMutation from './mutation';
-import type { Entity } from './resolver';
-
-function makeEntity(initial: Array<Record<string, any>> = []): Entity & {
-  _store: Array<Record<string, any>>;
-} {
-  const store = initial.map((r) => ({ ...r }));
-  return {
-    _store: store,
-    rawAttributes: { id: {}, name: {} },
-    findOne: async ({ where: { id } }: any) => store.find((r) => r.id === id) ?? null,
-    findAndCountAll: async () => ({ rows: store }),
-    create: async (item: any) => {
-      store.push(item);
-      return item;
-    },
-    update: async (item: any, { where: { id } }: any) => {
-      const idx = store.findIndex((r) => r.id === id);
-      if (idx >= 0) store[idx] = { ...store[idx], ...item };
-      return [1];
-    },
-  } as unknown as Entity & { _store: Array<Record<string, any>> };
-}
+import { makeEntity } from './testUtils/fakeEntity';
 
 describe('buildMutation', () => {
   test('create mutation resolves to created entity', async () => {

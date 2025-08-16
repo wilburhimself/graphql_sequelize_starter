@@ -8,11 +8,11 @@ declare module 'express-graphql' {
     graphiql?: boolean;
     context?: unknown;
     pretty?: boolean;
-    formatError?: (error: any) => any;
-    extensions?: (info: any) => any;
-    validationRules?: any[];
-    customFormatErrorFn?: (error: any) => any;
+    formatError?: (error: unknown) => unknown;
+    extensions?: (info: unknown) => unknown;
+    validationRules?: unknown[];
+    customFormatErrorFn?: (error: unknown) => unknown;
   }
 
-  export default function graphqlHTTP(options: Options | ((req: any) => Options)): RequestHandler;
+  export default function graphqlHTTP(options: Options | ((req: unknown) => Options)): RequestHandler;
 }

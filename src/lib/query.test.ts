@@ -1,28 +1,6 @@
 import buildQuery from './query';
-import type { Entity } from './resolver';
 import { GraphQLObjectType, GraphQLInt } from 'graphql';
-
-// Minimal fake entity implementation
-function makeEntity(initial: Array<Record<string, any>> = []): Entity & {
-  _store: Array<Record<string, any>>;
-} {
-  const store = initial.map((r) => ({ ...r }));
-  return {
-    _store: store,
-    rawAttributes: { id: {}, name: {} },
-    findOne: async ({ where: { id } }: any) => store.find((r) => r.id === id) ?? null,
-    findAndCountAll: async () => ({ rows: store }),
-    create: async (item: any) => {
-      store.push(item);
-      return item;
-    },
-    update: async (item: any, { where: { id } }: any) => {
-      const idx = store.findIndex((r) => r.id === id);
-      if (idx >= 0) store[idx] = { ...store[idx], ...item };
-      return [1];
-    },
-  } as unknown as Entity & { _store: Array<Record<string, any>> };
-}
+import { makeEntity } from './testUtils/fakeEntity';
 
 describe('buildQuery', () => {
   test('resolves by id returns array of one resolved item', async () => {

@@ -1,4 +1,4 @@
 declare module 'sequelize' {
-  const Sequelize: any;
+  const Sequelize: unknown;
   export default Sequelize;
 }

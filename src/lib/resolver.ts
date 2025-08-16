@@ -23,18 +23,18 @@ type AllOptions = {
   all?: boolean;
 };
 
-class Resolver {
-  private entity: Entity;
+class Resolver<T extends Record<string, unknown> = Record<string, unknown>> {
+  private entity: Entity<T>;
 
-  constructor(entity: Entity) {
+  constructor(entity: Entity<T>) {
     this.entity = entity;
   }
 
-  find(id: number | string) {
+  find(id: number | string): Promise<T | null> {
     return this.entity.findOne({ where: { id: id } }).then((items) => items);
   }
 
-  all(options?: AllOptions) {
+  all(options?: AllOptions): Promise<T[]> {
     const hasNameField = Object.getOwnPropertyNames(this.entity.rawAttributes).indexOf('name') == 1;
     const defaults = {
       perPage: Number(process.env.APP_PERPAGE),
@@ -58,11 +58,11 @@ class Resolver {
     return this.entity.findAndCountAll(queryOptions).then((items) => items.rows);
   }
 
-  create(item: Record<string, unknown>) {
+  create(item: Partial<T>): Promise<T> {
     return this.entity.create(item).then((result) => result);
   }
 
-  update(id: number | string, item: Record<string, unknown>) {
+  update<TId extends number | string, TInput extends Partial<T>>(id: TId, item: TInput): Promise<T | null> {
     return this.entity.update(item, { where: { id: id } }).then(() => this.find(id));
   }
 
@@ -70,8 +70,10 @@ class Resolver {
     return Number(process.env.APP_PERPAGE) * pageNumber;
   }
 
-  destroy(id: number | string) {
-    return this.entity.update({ enable: false }, { where: { id: id } }).then(() => this.find(id));
+  destroy(id: number | string): Promise<T | null> {
+    return this.entity
+      .update({ enable: false } as unknown as Partial<T>, { where: { id: id } })
+      .then(() => this.find(id));
   }
 }
 
