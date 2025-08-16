@@ -1,23 +1,30 @@
-import Resolver from './resolver';
+import Resolver, { Entity } from './resolver';
 import { GraphQLID } from 'graphql';
 
-const buildMutation = (name: string, type: any, input: any, model: any) => {
+type GraphQLTypeLike = unknown; // minimal due to local graphql shim
+
+const buildMutation = (
+  name: string,
+  type: GraphQLTypeLike,
+  input: GraphQLTypeLike,
+  model: Entity,
+) => {
   const resolver = new Resolver(model);
   return {
     [`create${name}`]: {
-      type: type,
+      type: type as unknown,
       args: {
-        input: { type: input },
+        input: { type: input as unknown },
       },
       resolve: (_value: unknown, { input }: { input: Record<string, unknown> }) => {
         return resolver.create(input);
       },
     },
     [`update${name}`]: {
-      type: type,
+      type: type as unknown,
       args: {
         id: { type: GraphQLID },
-        input: { type: input },
+        input: { type: input as unknown },
       },
       resolve: (
         _value: unknown,
@@ -27,7 +34,7 @@ const buildMutation = (name: string, type: any, input: any, model: any) => {
       },
     },
     [`destroy${name}`]: {
-      type: type,
+      type: type as unknown,
       args: {
         id: { type: GraphQLID },
       },
@@ -35,7 +42,7 @@ const buildMutation = (name: string, type: any, input: any, model: any) => {
         return resolver.destroy(id);
       },
     },
-  } as Record<string, any>;
+  } as Record<string, unknown>;
 };
 
 export default buildMutation;

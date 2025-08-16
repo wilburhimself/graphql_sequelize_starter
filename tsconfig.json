@@ -16,12 +16,5 @@
     "types": ["node", "jest"]
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src/routes/**/*.js",
-    "src/entities/**/*.js",
-    "src/lib/**/*.js",
-    "src/lib/helpers/**/*.js"
-  ]
+  "exclude": ["node_modules", "dist"]
 }

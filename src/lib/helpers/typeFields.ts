@@ -1,17 +1,25 @@
-import { GraphQLInt, GraphQLFloat, GraphQLString, GraphQLBoolean } from 'graphql';
+import {
+  GraphQLInt,
+  GraphQLFloat,
+  GraphQLString,
+  GraphQLBoolean,
+  GraphQLFieldConfigMap,
+} from 'graphql';
 
 // Minimal shapes for legacy Sequelize attribute metadata
 
 type Attribute = { fieldName: string; type: { constructor: { key?: string } } } & Record<
   string,
-  any
+  unknown
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ModelLike = { attributes: Record<string, Attribute> } & Record<string, any>;
+export type ModelLike = { name: string; attributes: Record<string, Attribute> } & Record<
+  string,
+  unknown
+>;
 
-export const getModelFields = (model: ModelLike) => {
-  const fs: Record<string, { type: unknown }> = {};
+export const getModelFields = (model: ModelLike): GraphQLFieldConfigMap => {
+  const fs: GraphQLFieldConfigMap = {};
 
   Object.values(model.attributes).map((field) => {
     return Object.assign(fs, {

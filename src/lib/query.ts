@@ -1,14 +1,25 @@
 import { GraphQLList, GraphQLInt, GraphQLBoolean, GraphQLString } from 'graphql';
-import Resolver from './resolver';
+import Resolver, { Entity } from './resolver';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const buildQuery = (name: string, type: any, model: any) => {
+type GraphQLCompositeType = unknown; // from local graphql shim, keep minimal
+
+type ResolveArgs = {
+  id?: number;
+  page?: number;
+  limit?: number;
+  offset?: number;
+  all?: boolean;
+  order?: string;
+};
+
+const buildQuery = (name: string, type: GraphQLCompositeType, model: Entity) => {
   const resolver = new Resolver(model);
   return {
     [name]: {
-      type: new GraphQLList(type),
+      type: new GraphQLList(type as unknown),
       args: {
         id: { type: GraphQLInt },
         page: { type: GraphQLInt },
@@ -17,24 +28,7 @@ const buildQuery = (name: string, type: any, model: any) => {
         all: { type: GraphQLBoolean },
         order: { type: GraphQLString },
       },
-      resolve: (
-        _value: unknown,
-        {
-          id,
-          page,
-          limit,
-          offset,
-          all,
-          order,
-        }: {
-          id?: number;
-          page?: number;
-          limit?: number;
-          offset?: number;
-          all?: boolean;
-          order?: string;
-        },
-      ) => {
+      resolve: (_value: unknown, { id, page, limit, offset, all, order }: ResolveArgs) => {
         return (() => {
           if (id) {
             return [resolver.find(id)];
@@ -48,12 +42,12 @@ const buildQuery = (name: string, type: any, model: any) => {
                     order: order ? order : '',
                   }
                 : { all };
-            return resolver.all(settings as any);
+            return resolver.all(settings);
           }
         })();
       },
     },
-  } as Record<string, any>;
+  } as Record<string, unknown>;
 };
 
 export default buildQuery;

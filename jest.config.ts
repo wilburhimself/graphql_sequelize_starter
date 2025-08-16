@@ -9,6 +9,7 @@ const config: Config = {
   collectCoverageFrom: [
     // Restrict to modules with tests during migration; expand as we add tests
     'src/lib/math.ts',
+    'src/lib/resolver.ts',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],

@@ -3,6 +3,8 @@ import fs from 'fs';
 import buildQuery from './query';
 import buildMutation from './mutation';
 import buildType from './type';
+import type { ModelLike } from './helpers/typeFields';
+import type { Entity } from './resolver';
 
 export type AutoloadOutput = {
   queries: Record<string, unknown>;
@@ -24,15 +26,18 @@ const autoload = (): AutoloadOutput => {
       if (fs.existsSync(modelPath)) {
         // require is intentional here to support legacy JS modules
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const model = (require(modelPath).default) as any;
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const type = fs.existsSync(typePath) ? (require(typePath).default as any) : buildType(model);
-        queryBag.push(buildQuery(file, type, model));
+        const model = require(modelPath).default as Entity & ModelLike;
+
+        const type = fs.existsSync(typePath)
+          ? // eslint-disable-next-line @typescript-eslint/no-require-imports
+            (require(typePath).default as unknown)
+          : buildType(model as ModelLike);
+        queryBag.push(buildQuery(file, type, model as Entity));
 
         if (fs.existsSync(inputPath)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const input = (require(inputPath).default) as any;
-          mutationBag.push(buildMutation(model.name, type, input, model));
+          const input = require(inputPath).default as unknown;
+          mutationBag.push(buildMutation(model.name, type, input, model as Entity));
         }
       }
     }

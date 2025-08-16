@@ -2,7 +2,18 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-type Entity = any; // Legacy Sequelize model
+type FindOneOptions = { where: { id: number | string } };
+type UpdateOptions = { where: { id: number | string } };
+type FindAndCountAllResult<T> = { rows: T[] };
+
+// Minimal interface for legacy Sequelize-like model we interact with
+export interface Entity<T = Record<string, unknown>> {
+  rawAttributes: Record<string, unknown>;
+  findOne(opts: FindOneOptions): Promise<T | null>;
+  findAndCountAll(opts: Record<string, unknown>): Promise<FindAndCountAllResult<T>>;
+  create(item: Partial<T>): Promise<T>;
+  update(item: Partial<T>, opts: UpdateOptions): Promise<unknown>;
+}
 
 type AllOptions = {
   currentPage?: number;
@@ -20,7 +31,7 @@ class Resolver {
   }
 
   find(id: number | string) {
-    return this.entity.findOne({ where: { id: id } }).then((items: unknown) => items);
+    return this.entity.findOne({ where: { id: id } }).then((items) => items);
   }
 
   all(options?: AllOptions) {
@@ -44,11 +55,11 @@ class Resolver {
       });
     }
 
-    return this.entity.findAndCountAll(queryOptions).then((items: any) => items.rows);
+    return this.entity.findAndCountAll(queryOptions).then((items) => items.rows);
   }
 
   create(item: Record<string, unknown>) {
-    return this.entity.create(item).then((result: unknown) => result);
+    return this.entity.create(item).then((result) => result);
   }
 
   update(id: number | string, item: Record<string, unknown>) {
