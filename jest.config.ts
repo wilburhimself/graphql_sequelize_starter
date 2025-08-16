@@ -10,6 +10,11 @@ const config: Config = {
     // Restrict to modules with tests during migration; expand as we add tests
     'src/lib/math.ts',
     'src/lib/resolver.ts',
+    'src/lib/query.ts',
+    'src/lib/mutation.ts',
+    'src/lib/type.ts',
+    'src/lib/input.ts',
+    'src/lib/helpers/typeFields.ts',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],
