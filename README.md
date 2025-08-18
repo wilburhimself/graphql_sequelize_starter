@@ -164,7 +164,7 @@ npx prettier --write .
 ## Roadmap (condensed)
 
 ### Phase 2. ORM Upgrade: Prisma
-- Replace Sequelize with Prisma (`schema.prisma`, `prisma migrate`, `prisma generate`).
+- ~Replace Sequelize with Prisma (`schema.prisma`, `prisma migrate`, `prisma generate`).~
 - Tests on SQLite in-memory; integration tests around models.
 - ✅ Deliverable: Database layer fully migrated, typed, and tested.
 
