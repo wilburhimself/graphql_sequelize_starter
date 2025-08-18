@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/wilburhimself/graphql_api_starter/actions/workflows/ci.yml/badge.svg)](https://github.com/wilburhimself/graphql_api_starter/actions/workflows/ci.yml)
 
-Starter kit for building a GraphQL server on Sequelize, with generated queries and CUD mutations per entity. Core libraries are written in TypeScript and covered by tests; entities can remain in legacy JS during migration.
+Starter kit for building a GraphQL server using Prisma as the ORM, with generated queries and CUD mutations per entity. Core libraries are written in TypeScript and covered by tests; entities can remain in legacy JS during migration.
 
 ## Quickstart
 
@@ -22,77 +22,37 @@ npm run dev
 Before using, create a `.env` file in the project root. Use the example below and substitute your values for the minimum setup needed to run the starter.
 
 ```
-DB_USER=database user
-DB_PASSWORD=database password
-DB_DATABASE=database name
-DB_HOST=database host
-DB_PORT=database port
-DB_DIALECT=database dialect (mysql, postgres, etc ...)
-
+# Web server
 APP_PORT=3000
 APP_PERPAGE=10 # default page size in query
+
+# Prisma connection string (example for Postgres)
+DATABASE_URL=postgresql://user:pass@localhost:5432/dbname
 ```
 
 ### Usage
 
-For each entity in your application you must create a directory in `src/entities`. In this case we are going to use a `Post` entity, so we create a `posts` directory. This directory contains 3 files:
-
-**`model.js`:** Is a `sequelize` model. It is used to define the entity data model and the model's operations.
+Define your data model in Prisma at `prisma/schema.prisma`, then run:
 
 ```
-import Sequelize from "sequelize";
-import db from "../../lib/database";
-
-const Post = db.define("Post",
-  {
-    id: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      field: 'id'
-    },
-    title: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      field: 'title'
-    },
-
-    introduction: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      field: 'introduction'
-    },
-
-    body: {
-      type: Sequelize.TEXT,
-      field: 'body'
-    },
-  }, {
-    tableName: 'posts',
-    timestamps: false
-  }
-);
-
-export default Post;
+npm run generate
+npm run migrate -- --name init
 ```
 
-**`input.js`:** The definition of the `GraphQLInputType` for the entity.
+At runtime, import the Prisma client from `src/lib/database` and pass the appropriate model delegate (e.g., `prisma.post`) into the GraphQL resolver builders.
+
+Example wiring of a list query with a Prisma delegate:
 
 ```
-import buildInput from '../../lib/input';
-import Model from './model';
+import prisma from '../lib/database';
+import buildQuery from '../lib/query';
 
-export default buildInput(Model);
-```
+// assuming you have a GraphQL type for Post
+const Query = {
+  ...buildQuery('posts', /* GraphQLType */ PostType, prisma.post),
+};
 
-**`type.js`:** The definition of the `GraphQLObjectType` for the entity.
-
-```
-import Model from './model';
-import buildType from '../../lib/type';
-
-const PostType = buildType(Model);
-export default PostType;
+export default Query;
 ```
 
 With this setup we can run with
@@ -119,7 +79,7 @@ npm start
 This project is being incrementally migrated to TypeScript. Core library modules are typed and covered by unit tests, while legacy entity modules under `src/entities/` remain JavaScript to preserve the original autoload behavior.
 
 - Typed core libs: `src/lib/resolver.ts`, `src/lib/query.ts`, `src/lib/mutation.ts`, `src/lib/type.ts`, `src/lib/input.ts`, `src/lib/helpers/typeFields.ts`.
-- Generics: `Resolver<T>` provides typed CRUD operations; `buildQuery<T>` and `buildMutation<T>` accept `Entity<T>` and propagate types.
+- Generics: `Resolver<T>` provides typed CRUD operations; `buildQuery<T>` and `buildMutation<T>` accept a Prisma-style `PrismaDelegate<T>` and propagate types.
 - Options types: `AllOptions` and `QueryOptions` describe pagination/order settings.
 - Minimal type shims are applied where needed in the codebase.
 
@@ -159,10 +119,10 @@ Create `.env` in the project root (see Config above). Important:
 
 ## Architecture Highlights
 
-- `src/lib/resolver.ts`: `Resolver<T>` wraps CRUD with pagination helpers; uses `AllOptions`/`QueryOptions`.
+- `src/lib/resolver.ts`: `Resolver<T>` wraps CRUD with pagination helpers; uses `AllOptions`/`QueryOptions` and expects a Prisma-style delegate.
 - `src/lib/query.ts`: `buildQuery<T>` wires GraphQL list queries, supports id lookup and pagination; uses discriminated args for stronger typing.
 - `src/lib/mutation.ts`: `buildMutation<T>` wires create/update/destroy with typed inputs.
-- `src/lib/helpers/typeFields.ts`: maps Sequelize-like attribute metadata to GraphQL field types.
+- `src/lib/helpers/typeFields.ts`: legacy helper that mapped Sequelize-like attribute metadata to GraphQL types. Consider replacing with explicit domain GraphQL types or a Prisma-first approach (e.g., Nexus + Prisma) as you evolve the schema.
 
 ## Testing
 
