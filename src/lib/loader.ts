@@ -2,9 +2,8 @@ import path from 'path';
 import fs from 'fs';
 import buildQuery from './query';
 import buildMutation from './mutation';
-import buildType from './type';
 import type { ModelLike } from './helpers/typeFields';
-import type { Entity } from './resolver';
+import type { PrismaDelegate } from './resolver';
 
 export type AutoloadOutput = {
   queries: Record<string, unknown>;
@@ -26,18 +25,22 @@ const autoload = (): AutoloadOutput => {
       if (fs.existsSync(modelPath)) {
         // require is intentional here to support legacy JS modules
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const model = require(modelPath).default as Entity & ModelLike;
+        const model = require(modelPath).default as PrismaDelegate & ModelLike;
 
-        const type = fs.existsSync(typePath)
-          ? // eslint-disable-next-line @typescript-eslint/no-require-imports
-            (require(typePath).default as unknown)
-          : buildType(model as ModelLike);
-        queryBag.push(buildQuery(file, type, model as Entity));
+        // Explicit types only: require type.js; skip entity if missing
+        if (!fs.existsSync(typePath)) {
+          // eslint-disable-next-line no-console
+          console.warn(`Skipping entity '${file}': missing explicit GraphQL type at ${typePath}`);
+          return;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const type = require(typePath).default as unknown;
+        queryBag.push(buildQuery(file, type, model as PrismaDelegate));
 
         if (fs.existsSync(inputPath)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const input = require(inputPath).default as unknown;
-          mutationBag.push(buildMutation(model.name, type, input, model as Entity));
+          mutationBag.push(buildMutation(model.name, type, input, model as PrismaDelegate));
         }
       }
     }

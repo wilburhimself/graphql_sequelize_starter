@@ -52,4 +52,54 @@ describe('buildQuery', () => {
     const rows = (await field.resolve(null, { page: 2, limit: 1 })) as unknown[];
     expect(Array.isArray(rows)).toBe(true);
   });
+
+  test('resolves list with order only (exercises order fallback branch)', async () => {
+    const model = makeEntity([
+      { id: 1, name: 'A' },
+      { id: 2, name: 'B' },
+    ]);
+    const gqlType = new GraphQLObjectType({
+      name: 'UserType',
+      fields: { id: { type: GraphQLInt } },
+    });
+    const fields = buildQuery('users', gqlType as unknown, model);
+    const view = fields as Record<string, { resolve: (parent: unknown, args: unknown) => unknown }>;
+    const field = view.users;
+    const rows = (await field.resolve(null, { order: 'id DESC' })) as unknown[];
+    expect(Array.isArray(rows)).toBe(true);
+  });
+
+  test('resolves list with offset only (exercises offset fallback branch)', async () => {
+    const model = makeEntity([
+      { id: 1, name: 'A' },
+      { id: 2, name: 'B' },
+      { id: 3, name: 'C' },
+    ]);
+    const gqlType = new GraphQLObjectType({
+      name: 'UserType',
+      fields: { id: { type: GraphQLInt } },
+    });
+    const fields = buildQuery('users', gqlType as unknown, model);
+    const view = fields as Record<string, { resolve: (parent: unknown, args: unknown) => unknown }>;
+    const field = view.users;
+    const rows = (await field.resolve(null, { offset: 1 })) as unknown[];
+    expect(Array.isArray(rows)).toBe(true);
+  });
+
+  test('resolves list with all=true (exercises else branch)', async () => {
+    const model = makeEntity([
+      { id: 1, name: 'A' },
+      { id: 2, name: 'B' },
+      { id: 3, name: 'C' },
+    ]);
+    const gqlType = new GraphQLObjectType({
+      name: 'UserType',
+      fields: { id: { type: GraphQLInt } },
+    });
+    const fields = buildQuery('users', gqlType as unknown, model);
+    const view = fields as Record<string, { resolve: (parent: unknown, args: unknown) => unknown }>;
+    const field = view.users;
+    const rows = (await field.resolve(null, { all: true })) as unknown[];
+    expect(Array.isArray(rows)).toBe(true);
+  });
 });

@@ -112,9 +112,10 @@ Create `.env` in the project root (see Config above). Important:
 
 - Source code is in TypeScript under `src/`.
 - Entities under `src/entities/<entity>/` are still JS and autoloaded by `src/lib/loader.js`:
-  - `model.js` (Sequelize-like model)
+  - `model.js` (model/delegate for data access)
+  - `type.js` (GraphQLObjectType) — REQUIRED
   - `input.js` (GraphQLInputType) — optional
-  - `type.js` (GraphQLObjectType) — optional; will be generated if missing
+- Note: The previous fallback that auto-generated a type when `type.js` was missing has been removed. Entities without `type.js` will be skipped by the loader with a warning.
 - Migration is gradual; both TS core and JS entities are supported.
 
 ## Architecture Highlights

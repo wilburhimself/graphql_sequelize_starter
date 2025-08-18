@@ -6,6 +6,19 @@ import {
   GraphQLFieldConfigMap,
 } from 'graphql';
 
+/**
+ * LEGACY: Sequelize-oriented field mapper
+ *
+ * This helper was originally designed to translate Sequelize attribute metadata
+ * (using `type.constructor.key`) into GraphQL field types. To ease migration
+ * away from Sequelize, it now also accepts simpler, non-Sequelize keys such as
+ * 'String' | 'Boolean' | 'Int' | 'Float' (case-insensitive).
+ *
+ * Prefer migrating to explicit GraphQL types or a Prisma-first schema builder
+ * (e.g., Pothos/Nexus). Once callers stop using `buildType()/getModelFields()`,
+ * this module can be removed.
+ */
+
 // Minimal shapes for legacy Sequelize attribute metadata
 
 type Attribute = { fieldName: string; type: { constructor: { key?: string } } } & Record<
@@ -33,14 +46,49 @@ export const getModelFields = (model: ModelLike): GraphQLFieldConfigMap => {
 };
 
 export const getFieldType = (field: Attribute) => {
-  switch (field.type.constructor.key) {
+  // Support both Sequelize-style keys and simple string keys.
+  // 1) Sequelize: field.type.constructor.key
+  // 2) Simple: field.type is a string like 'String' | 'Boolean' | 'Int' | 'Float'
+  const raw: unknown = (field as any)?.type?.constructor?.key ??
+    (typeof (field as any)?.type === 'string' ? (field as any).type : undefined);
+
+  const keyUpper = String(raw ?? '').toUpperCase();
+  const keyLower = String(raw ?? '').toLowerCase();
+
+  switch (keyUpper) {
+    // Strings
     case 'STRING':
+    case 'TEXT':
       return GraphQLString;
+    // Booleans
     case 'BOOLEAN':
+    case 'BOOL':
       return GraphQLBoolean;
+    // Integers
     case 'INTEGER':
+    case 'INT':
       return GraphQLInt;
+    // Floats / numbers
     case 'DOUBLE PRECISION':
+    case 'FLOAT':
+    case 'DOUBLE':
+    case 'DECIMAL':
+    case 'NUMBER':
+      return GraphQLFloat;
+  }
+
+  // Fallback for common lowercase names when not provided by Sequelize
+  switch (keyLower) {
+    case 'string':
+      return GraphQLString;
+    case 'boolean':
+      return GraphQLBoolean;
+    case 'int':
+    case 'integer':
+      return GraphQLInt;
+    case 'float':
+    case 'double':
+    case 'number':
       return GraphQLFloat;
     default:
       return GraphQLString;
