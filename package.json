@@ -20,8 +20,7 @@
     "pg": "^6.1.5",
     "pg-hstore": "^2.3.2",
     "pug": "~2.0.0-rc.4",
-    "sequelize": "^3.30.2",
-    "sequelize-cli": "^2.6.0",
+    "@prisma/client": "^5.19.1",
     "serve-favicon": "~2.4.2",
     "underscore": "^1.8.3"
   },
@@ -49,7 +48,8 @@
     "ts-jest": "^29.2.5",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^8.8.1"
+    "typescript-eslint": "^8.8.1",
+    "prisma": "^5.19.1"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -57,7 +57,10 @@
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "test": "jest",
     "lint": "eslint . --ext .ts,.js",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prisma": "prisma",
+    "migrate": "prisma migrate dev",
+    "generate": "prisma generate"
   },
   "repository": {
     "type": "git",

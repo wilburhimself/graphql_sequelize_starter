@@ -1,4 +1,4 @@
-import Resolver, { Entity } from './resolver';
+import Resolver, { PrismaDelegate } from './resolver';
 import { GraphQLID } from 'graphql';
 
 type GraphQLTypeLike = unknown; // minimal due to local graphql shim
@@ -7,7 +7,7 @@ const buildMutation = <T extends Record<string, unknown>>(
   name: string,
   type: GraphQLTypeLike,
   input: GraphQLTypeLike,
-  model: Entity<T>,
+  model: PrismaDelegate<T>,
 ) => {
   const resolver = new Resolver<T>(model);
   return {

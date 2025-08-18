@@ -1,0 +1,18 @@
+// Prisma schema for the GraphQL API starter
+// Datasource and generator are set up for PostgreSQL. Adjust provider if needed.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Minimal placeholder model to allow initial migration.
+// Replace or extend with real domain models.
+model Meta {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+}

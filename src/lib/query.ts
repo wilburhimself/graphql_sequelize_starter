@@ -1,5 +1,5 @@
 import { GraphQLList, GraphQLInt, GraphQLBoolean, GraphQLString } from 'graphql';
-import Resolver, { Entity, AllOptions } from './resolver';
+import Resolver, { PrismaDelegate, AllOptions } from './resolver';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -29,7 +29,7 @@ type ResolveArgs = ResolveByIdArgs | ResolveListArgs;
 const buildQuery = <T extends Record<string, unknown>>(
   name: string,
   type: GraphQLCompositeType,
-  model: Entity<T>,
+  model: PrismaDelegate<T>,
 ) => {
   const resolver = new Resolver<T>(model);
   return {

@@ -2,17 +2,12 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-type FindOneOptions = { where: { id: number | string } };
-type UpdateOptions = { where: { id: number | string } };
-type FindAndCountAllResult<T> = { rows: T[] };
-
-// Minimal interface for legacy Sequelize-like model we interact with
-export interface Entity<T = Record<string, unknown>> {
-  rawAttributes: Record<string, unknown>;
-  findOne(opts: FindOneOptions): Promise<T | null>;
-  findAndCountAll(opts: Record<string, unknown>): Promise<FindAndCountAllResult<T>>;
-  create(item: Partial<T>): Promise<T>;
-  update(item: Partial<T>, opts: UpdateOptions): Promise<unknown>;
+// Minimal Prisma-style delegate interface we need
+export interface PrismaDelegate<T = Record<string, unknown>> {
+  findUnique(args: { where: { id: number | string } }): Promise<T | null>;
+  findMany(args: { skip?: number; take?: number; orderBy?: unknown }): Promise<T[]>;
+  create(args: { data: Partial<T> }): Promise<T>;
+  update(args: { where: { id: number | string }; data: Partial<T> }): Promise<T>;
 }
 
 export type AllOptions = {
@@ -26,49 +21,66 @@ export type AllOptions = {
 export type QueryOptions = Pick<AllOptions, 'currentPage' | 'limit' | 'offset' | 'order'>;
 
 class Resolver<T extends Record<string, unknown> = Record<string, unknown>> {
-  private entity: Entity<T>;
+  private entity: PrismaDelegate<T>;
 
-  constructor(entity: Entity<T>) {
+  constructor(entity: PrismaDelegate<T>) {
     this.entity = entity;
   }
 
   find(id: number | string): Promise<T | null> {
-    return this.entity.findOne({ where: { id: id } }).then((items) => items);
+    return this.entity.findUnique({ where: { id } }).then((item) => item);
   }
 
   all(options?: AllOptions): Promise<T[]> {
-    const hasNameField = Object.getOwnPropertyNames(this.entity.rawAttributes).indexOf('name') == 1;
+    const perPageRaw = Number(process.env.APP_PERPAGE);
+    const defaultLimit = Number.isFinite(perPageRaw) && perPageRaw > 0 ? perPageRaw : undefined;
     const defaults = {
-      perPage: Number(process.env.APP_PERPAGE),
-      limit: Number(process.env.APP_PERPAGE),
-      offset: 0,
-    };
+      perPage: defaultLimit,
+      limit: defaultLimit,
+      offset: 0 as number | undefined,
+    } as { perPage?: number; limit?: number; offset?: number };
 
-    Object.assign(defaults, { order: hasNameField ? 'name ASC' : options?.order });
+    Object.assign(defaults, { order: options?.order });
 
     const settings = Object.assign({}, defaults, options || {});
     const queryOptions: QueryOptions = {};
 
     if (!settings.all) {
+      const limit = typeof settings.limit === 'number' && settings.limit > 0 ? settings.limit : undefined;
+      const offsetCandidate = settings.currentPage ? this.page(settings.currentPage) : settings.offset;
+      const offset = typeof offsetCandidate === 'number' && offsetCandidate >= 0 ? offsetCandidate : undefined;
       Object.assign(queryOptions, {
-        limit: settings.limit,
-        offset: settings.currentPage ? this.page(settings.currentPage) : settings.offset,
+        limit,
+        offset,
         order: settings.order,
       });
     }
 
-    return this.entity.findAndCountAll(queryOptions).then((items) => items.rows);
+    // Translate to Prisma findMany
+    const orderBy = queryOptions.order
+      ? // very naive "field direction" parser: "name ASC" or "createdAt DESC"
+        (() => {
+          const [field, direction] = String(queryOptions.order).split(/\s+/);
+          return field ? ({ [field]: (direction || 'asc').toLowerCase() } as unknown) : undefined;
+        })()
+      : undefined;
+
+    return this.entity.findMany({
+      skip: queryOptions.offset,
+      take: queryOptions.limit,
+      orderBy,
+    });
   }
 
   create(item: Partial<T>): Promise<T> {
-    return this.entity.create(item).then((result) => result);
+    return this.entity.create({ data: item }).then((result) => result);
   }
 
   update<TId extends number | string, TInput extends Partial<T>>(
     id: TId,
     item: TInput,
   ): Promise<T | null> {
-    return this.entity.update(item, { where: { id: id } }).then(() => this.find(id));
+    return this.entity.update({ where: { id }, data: item }).then(() => this.find(id));
   }
 
   page(pageNumber: number) {
@@ -77,7 +89,7 @@ class Resolver<T extends Record<string, unknown> = Record<string, unknown>> {
 
   destroy(id: number | string): Promise<T | null> {
     return this.entity
-      .update({ enable: false } as unknown as Partial<T>, { where: { id: id } })
+      .update({ where: { id }, data: { enable: false } as unknown as Partial<T> })
       .then(() => this.find(id));
   }
 }
