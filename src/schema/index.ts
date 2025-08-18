@@ -4,6 +4,7 @@ import { GraphQLSchema } from 'graphql';
 
 // Minimal Query to verify Pothos + Prisma wiring.
 builder.queryType({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fields: (t: any) => ({
     metaCount: t.int({
       description: 'Count of Meta rows',

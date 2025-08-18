@@ -49,8 +49,18 @@ export const getFieldType = (field: Attribute) => {
   // Support both Sequelize-style keys and simple string keys.
   // 1) Sequelize: field.type.constructor.key
   // 2) Simple: field.type is a string like 'String' | 'Boolean' | 'Int' | 'Float'
-  const raw: unknown = (field as any)?.type?.constructor?.key ??
-    (typeof (field as any)?.type === 'string' ? (field as any).type : undefined);
+  type Ctor = { key?: string } | undefined;
+  type MaybeSequelize = { constructor?: Ctor } | string | unknown;
+
+  const t: MaybeSequelize = (field as { type: unknown }).type as MaybeSequelize;
+  let raw: string | undefined;
+
+  if (typeof t === 'string') {
+    raw = t;
+  } else if (t && typeof t === 'object') {
+    const ctor = (t as { constructor?: { key?: string } }).constructor;
+    raw = ctor && typeof ctor === 'object' ? (ctor as { key?: string }).key : undefined;
+  }
 
   const keyUpper = String(raw ?? '').toUpperCase();
   const keyLower = String(raw ?? '').toLowerCase();

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getModelFields, getFieldType, type ModelLike } from './typeFields';
 import { GraphQLString, GraphQLBoolean, GraphQLInt, GraphQLFloat } from 'graphql';
 
@@ -39,7 +40,7 @@ describe('helpers/typeFields', () => {
   });
 
   test('getFieldType supports simple non-Sequelize keys (capitalized)', () => {
-    const simple = (key: string) => ({ fieldName: 'x', type: key } as any);
+    const simple = (key: string) => ({ fieldName: 'x', type: key }) as any;
     expect(getFieldType(simple('String'))).toBe(GraphQLString);
     expect(getFieldType(simple('Boolean'))).toBe(GraphQLBoolean);
     expect(getFieldType(simple('Int'))).toBe(GraphQLInt);
@@ -47,7 +48,7 @@ describe('helpers/typeFields', () => {
   });
 
   test('getFieldType supports simple non-Sequelize keys (lowercase)', () => {
-    const simple = (key: string) => ({ fieldName: 'x', type: key } as any);
+    const simple = (key: string) => ({ fieldName: 'x', type: key }) as any;
     expect(getFieldType(simple('string'))).toBe(GraphQLString);
     expect(getFieldType(simple('boolean'))).toBe(GraphQLBoolean);
     expect(getFieldType(simple('int'))).toBe(GraphQLInt);

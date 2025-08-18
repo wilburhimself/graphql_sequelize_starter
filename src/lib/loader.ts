@@ -29,7 +29,6 @@ const autoload = (): AutoloadOutput => {
 
         // Explicit types only: require type.js; skip entity if missing
         if (!fs.existsSync(typePath)) {
-          // eslint-disable-next-line no-console
           console.warn(`Skipping entity '${file}': missing explicit GraphQL type at ${typePath}`);
           return;
         }

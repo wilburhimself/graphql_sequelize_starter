@@ -46,9 +46,13 @@ class Resolver<T extends Record<string, unknown> = Record<string, unknown>> {
     const queryOptions: QueryOptions = {};
 
     if (!settings.all) {
-      const limit = typeof settings.limit === 'number' && settings.limit > 0 ? settings.limit : undefined;
-      const offsetCandidate = settings.currentPage ? this.page(settings.currentPage) : settings.offset;
-      const offset = typeof offsetCandidate === 'number' && offsetCandidate >= 0 ? offsetCandidate : undefined;
+      const limit =
+        typeof settings.limit === 'number' && settings.limit > 0 ? settings.limit : undefined;
+      const offsetCandidate = settings.currentPage
+        ? this.page(settings.currentPage)
+        : settings.offset;
+      const offset =
+        typeof offsetCandidate === 'number' && offsetCandidate >= 0 ? offsetCandidate : undefined;
       Object.assign(queryOptions, {
         limit,
         offset,

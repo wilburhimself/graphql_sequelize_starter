@@ -14,7 +14,7 @@ const databaseUrl =
 
 if (!databaseUrl) {
   throw new Error(
-    'DATABASE_URL is not set and legacy DB_* variables are insufficient to build one.'
+    'DATABASE_URL is not set and legacy DB_* variables are insufficient to build one.',
   );
 }
 

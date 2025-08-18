@@ -2,21 +2,34 @@ import type { PrismaDelegate } from '../resolver';
 
 export type FakeRow = { id: number | string } & Record<string, unknown>;
 
-export function makeEntity(initial: FakeRow[] = []): PrismaDelegate<FakeRow> & { _store: FakeRow[] } {
+export function makeEntity(
+  initial: FakeRow[] = [],
+): PrismaDelegate<FakeRow> & { _store: FakeRow[] } {
   const store = initial.map((r) => ({ ...r })) as FakeRow[];
   return {
     _store: store,
     findUnique: async ({ where: { id } }: { where: { id: number | string } }) =>
       store.find((r) => r.id === id) ?? null,
-    findMany: async ({ skip, take, orderBy }: { skip?: number; take?: number; orderBy?: any }) => {
+    findMany: async ({
+      skip,
+      take,
+      orderBy,
+    }: {
+      skip?: number;
+      take?: number;
+      orderBy?: Record<string, 'asc' | 'desc'>;
+    }) => {
       let rows = [...store];
       if (orderBy && typeof orderBy === 'object') {
         const [[field, dir]] = Object.entries(orderBy);
         rows.sort((a, b) => {
-          const av = a[field] as any;
-          const bv = b[field] as any;
-          if (av === bv) return 0;
-          const cmp = av > bv ? 1 : -1;
+          const av = a[field] as unknown;
+          const bv = b[field] as unknown;
+          // Normalize to string for predictable test ordering
+          const as = String(av);
+          const bs = String(bv);
+          if (as === bs) return 0;
+          const cmp = as > bs ? 1 : -1;
           return String(dir).toLowerCase() === 'desc' ? -cmp : cmp;
         });
       }
@@ -29,7 +42,13 @@ export function makeEntity(initial: FakeRow[] = []): PrismaDelegate<FakeRow> & {
       store.push(next);
       return next;
     },
-    update: async ({ where: { id }, data }: { where: { id: number | string }; data: Partial<FakeRow> }) => {
+    update: async ({
+      where: { id },
+      data,
+    }: {
+      where: { id: number | string };
+      data: Partial<FakeRow>;
+    }) => {
       const idx = store.findIndex((r) => r.id === id);
       if (idx >= 0) store[idx] = { ...store[idx], ...data } as FakeRow;
       return store[idx] as FakeRow;
@@ -38,6 +57,9 @@ export function makeEntity(initial: FakeRow[] = []): PrismaDelegate<FakeRow> & {
 }
 
 // Kept for compatibility in tests; same as makeEntity but without any expectation of a `name` field
-export function makeEntityNoName(initial: FakeRow[] = []): PrismaDelegate<FakeRow> & { _store: FakeRow[] } {
+export function makeEntityNoName(
+  initial: FakeRow[] = [],
+): PrismaDelegate<FakeRow> & { _store: FakeRow[] } {
   return makeEntity(initial) as PrismaDelegate<FakeRow> & { _store: FakeRow[] };
 }
+// end of file
