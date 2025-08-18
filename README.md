@@ -61,7 +61,7 @@ With this setup we can run with
 npm start
 ```
 
-And visit `http://localhost:3000`
+And visit `http://localhost:3000/graph` (GraphiQL via GraphQL Yoga)
 
 For development vs production:
 
@@ -102,7 +102,7 @@ Create `.env` in the project root (see Config above). Important:
 
 ## Scripts
 
-- `npm start` — start the server (visit http://localhost:3000)
+- `npm start` — start the server (visit http://localhost:3000/graph)
 - `npm test` — run Jest unit tests with coverage
 - `npm run lint` — run ESLint (flat config) over TS/JS
 - `npm run lint -- --fix` — apply autofixable ESLint and Prettier fixes
@@ -111,12 +111,26 @@ Create `.env` in the project root (see Config above). Important:
 ## Development
 
 - Source code is in TypeScript under `src/`.
+- GraphQL endpoint is provided by GraphQL Yoga at `/graph`.
+- Pothos + Prisma schema lives under `src/schema/`:
+  - `src/schema/builder.ts` — Pothos builder with Prisma plugin and client
+  - `src/schema/index.ts` — defines the root Query/Mutation and exports `schema`
 - Entities under `src/entities/<entity>/` are still JS and autoloaded by `src/lib/loader.js`:
   - `model.js` (model/delegate for data access)
   - `type.js` (GraphQLObjectType) — REQUIRED
   - `input.js` (GraphQLInputType) — optional
 - Note: The previous fallback that auto-generated a type when `type.js` was missing has been removed. Entities without `type.js` will be skipped by the loader with a warning.
 - Migration is gradual; both TS core and JS entities are supported.
+
+### Example query (Pothos + Yoga)
+
+Once the server is running, open GraphiQL at `http://localhost:3000/graph` and run:
+
+```
+query {
+  metaCount
+}
+```
 
 ## Architecture Highlights
 

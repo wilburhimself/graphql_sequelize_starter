@@ -1,16 +1,11 @@
 import { Router } from 'express';
-import graphqlHTTP from 'express-graphql';
-import schema from '../entities';
+import { createYoga } from 'graphql-yoga';
+import schema from '../schema';
 
 const routes = Router();
 
-routes.use(
-  '/',
-  graphqlHTTP({
-    schema,
-    rootValue: globalThis,
-    graphiql: true,
-  }),
-);
+// Mount Yoga at /graph
+const yoga = createYoga({ schema, graphqlEndpoint: '/graph', maskedErrors: false });
+routes.use(yoga.graphqlEndpoint, yoga);
 
 export default routes;
